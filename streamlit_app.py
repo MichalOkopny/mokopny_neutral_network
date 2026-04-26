@@ -9,7 +9,7 @@ st.title("Gemini chatbot app")
 api_key, base_url = st.secrets["API_KEY"], st.secrets["BASE_URL"]
 selected_model = st.selectbox(
     "Select a model", 
-    ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash"], 
+    "gemini-2.5-flash", 
     index=0
 )
 
