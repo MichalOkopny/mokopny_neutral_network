@@ -1,5 +1,7 @@
-openai
 streamlit
-PYPDF2
-pdfplumber
+openai
 PyMuPDF
+faiss-cpu
+langchain-huggingface
+sentence-transformers
+numpy
