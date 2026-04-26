@@ -22,11 +22,16 @@ if prompt := st.chat_input():
     client = OpenAI(api_key=api_key, base_url=base_url)
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
-    response = client.chat.completions.create(
-        model=selected_model,
-        messages=st.session_state.messages
-    )
+    try:
+        response = client.chat.completions.create(
+            model=selected_model,
+            messages=st.session_state.messages
+        )
 
-    msg = response.choices[0].message.content
-    st.session_state.messages.append({"role": "assistant", "content": msg})
-    st.chat_message("assistant").write(msg)
+        msg = response.choices[0].message.content
+        st.session_state.messages.append({"role": "assistant", "content": msg})
+        st.chat_message("assistant").write(msg)
+    except Exception as e:
+        # To wyświetli dokładny komunikat błędu z serwera na czerwonym tle w aplikacji
+        st.error(f"Wystąpił błąd API: {e}")
+        st.stop()
