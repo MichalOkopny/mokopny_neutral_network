@@ -18,6 +18,33 @@ if "messages" not in st.session_state:
 
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
+uploaded_files = st.file_uploader("Dołącz pliki (opcjonalnie)", accept_multiple_files=True, help="Załącz pliki; ich treść zostanie dołączona do wiadomości przed wysłaniem.")
+if uploaded_files:
+    for f in uploaded_files:
+        try:
+            data = f.getvalue()
+            # próba dekodowania jako tekst
+            if isinstance(data, (bytes, bytearray)):
+                try:
+                    text = data.decode("utf-8")
+                    snippet = text if len(text) <= 5000 else text[:5000] + "\n...[przycięte]"
+                    st.write(f"Załączono plik tekstowy: {f.name}")
+                    st.code(snippet)
+                    st.session_state.messages.append({"role": "user", "content": f"Załącznik {f.name}:\n{snippet}"})
+                    continue
+                except UnicodeDecodeError:
+                    pass
+
+            # jeśli to obraz — wyświetl i dodaj notkę
+            if f.type and f.type.startswith("image/"):
+                st.image(data, caption=f.name)
+                st.session_state.messages.append({"role": "user", "content": f"Załączono obraz {f.name} (wyświetlony)."})
+            else:
+                # plik binarny lub nieobsługiwany — dodaj notkę bez treści
+                st.warning(f"Nie można odczytać zawartości pliku jako tekst: {f.name}. Dołączono notatkę zamiast treści.")
+                st.session_state.messages.append({"role": "user", "content": f"Załączono plik: {f.name} (zawartość nie dołączona)."})
+        except Exception as e:
+            st.error(f"Błąd przy wczytywaniu pliku {f.name}: {e}")
 
 if prompt := st.chat_input():
     if not api_key:
